@@ -12,6 +12,7 @@ using OneMillionCopy.Leads.Application.Leads.Services;
 namespace OneMillionCopy.Leads.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("leads")]
 public sealed class LeadsController : ControllerBase
 {
