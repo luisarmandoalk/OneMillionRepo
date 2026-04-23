@@ -7,12 +7,10 @@ namespace OneMillionCopy.Leads.Api.Middleware;
 public sealed class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IHostEnvironment _environment;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next, IHostEnvironment environment)
+    public ExceptionHandlingMiddleware(RequestDelegate next)
     {
         _next = next;
-        _environment = environment;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -33,23 +31,15 @@ public sealed class ExceptionHandlingMiddleware
 
             await context.Response.WriteAsync(payload);
         }
-        catch (Exception exception)
+        catch (Exception)
         {
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
 
-            object payloadObject = _environment.IsDevelopment()
-                ? new
-                {
-                    error = "Ocurrio un error interno en el servidor.",
-                    detail = exception.Message
-                }
-                : new
-                {
-                    error = "Ocurrio un error interno en el servidor."
-                };
-
-            var payload = JsonSerializer.Serialize(payloadObject);
+            var payload = JsonSerializer.Serialize(new
+            {
+                error = "Ocurrio un error interno en el servidor."
+            });
 
             await context.Response.WriteAsync(payload);
         }

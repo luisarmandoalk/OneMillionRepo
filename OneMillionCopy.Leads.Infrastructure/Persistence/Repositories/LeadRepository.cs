@@ -87,7 +87,11 @@ public sealed class LeadRepository : ILeadRepository
                 x.Cantidad))
             .ToList();
 
-        var promedioPresupuesto = await leads.AverageAsync(x => x.Presupuesto, cancellationToken) ?? 0m;
+        var promedioPresupuesto = await leads
+            .Where(x => x.Presupuesto.HasValue)
+            .Select(x => x.Presupuesto!.Value)
+            .DefaultIfEmpty(0m)
+            .AverageAsync(cancellationToken);
 
         var leadsUltimos7Dias = await leads
             .CountAsync(x => x.CreatedAtUtc >= last7Days, cancellationToken);

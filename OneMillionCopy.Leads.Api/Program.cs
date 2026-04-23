@@ -52,8 +52,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
                 token = token.Trim().Trim('"');
 
-                context.Token = token.Contains(',') ? token.Split(',')[0].Trim() : token;
-                context.HttpContext.Items["ResolvedJwtToken"] = context.Token;
+                context.Token = token;
 
                 return Task.CompletedTask;
             },
@@ -70,14 +69,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
                 var detail = context.AuthenticateFailure?.Message ?? "Token invalido o ausente.";
                 var authorizationHeader = context.Request.Headers.Authorization.ToString();
-                var resolvedToken = context.HttpContext.Items["ResolvedJwtToken"]?.ToString();
 
                 await context.Response.WriteAsJsonAsync(new
                 {
                     error = "invalid_token",
                     detail,
-                    authorizationHeader,
-                    resolvedToken
+                    authorizationHeader
                 });
             }
         };
