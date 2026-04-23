@@ -8,7 +8,7 @@ public sealed class JwtOptions
 
     public string Audience { get; set; } = "OneMillionCopy.Leads.Client";
 
-    public string SecretKey { get; set; } = "ChangeThisSecretKeyToARealLongValue123456789";
+    public string SecretKey { get; set; } = "JWTKEYSTRONG1234567890KEYGENERATED";
 
     public int ExpirationMinutes { get; set; } = 60;
 }
