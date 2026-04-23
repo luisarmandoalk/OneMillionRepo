@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="OneMillionCopy.Leads.Api/OneMillionCopy.Leads.Api.csproj" />
+  <Project Path="OneMillionCopy.Leads.Application/OneMillionCopy.Leads.Application.csproj" />
+  <Project Path="OneMillionCopy.Leads.Domain/OneMillionCopy.Leads.Domain.csproj" />
+  <Project Path="OneMillionCopy.Leads.Infrastructure/OneMillionCopy.Leads.Infrastructure.csproj" />
+  <Project Path="OneMillionCopy.Leads.Tests/OneMillionCopy.Leads.Tests.csproj" />
+</Solution>

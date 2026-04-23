@@ -1,0 +1,6 @@
+@OneMillionCopy.Leads.Api_HostAddress = http://localhost:5243
+
+GET {{OneMillionCopy.Leads.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
