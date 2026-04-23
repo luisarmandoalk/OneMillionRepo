@@ -1,0 +1,14 @@
+# .NET
+bin/
+obj/
+
+# NuGet
+.nuget/
+packages/
+
+# Archivos de usuario
+*.user
+*.suo
+
+# Otros
+.vs/
