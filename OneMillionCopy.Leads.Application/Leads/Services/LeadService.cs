@@ -3,6 +3,7 @@ using OneMillionCopy.Leads.Application.Common.Exceptions;
 using OneMillionCopy.Leads.Application.Common.Models;
 using OneMillionCopy.Leads.Application.Leads;
 using OneMillionCopy.Leads.Application.Leads.Commands.CreateLead;
+using OneMillionCopy.Leads.Application.Leads.Commands.GenerateLeadSummary;
 using OneMillionCopy.Leads.Application.Leads.Commands.UpdateLead;
 using OneMillionCopy.Leads.Application.Leads.Dtos;
 using OneMillionCopy.Leads.Application.Leads.Queries.GetLeads;
@@ -23,10 +24,12 @@ public sealed class LeadService : ILeadService
     };
 
     private readonly ILeadRepository _leadRepository;
+    private readonly ILeadAiSummaryGenerator _leadAiSummaryGenerator;
 
-    public LeadService(ILeadRepository leadRepository)
+    public LeadService(ILeadRepository leadRepository, ILeadAiSummaryGenerator leadAiSummaryGenerator)
     {
         _leadRepository = leadRepository;
+        _leadAiSummaryGenerator = leadAiSummaryGenerator;
     }
 
     public async Task<LeadResponse> CreateAsync(CreateLeadCommand command, CancellationToken cancellationToken = default)
@@ -211,6 +214,35 @@ public sealed class LeadService : ILeadService
     public Task<LeadStatsResponse> GetStatsAsync(CancellationToken cancellationToken = default)
     {
         return _leadRepository.GetStatsAsync(cancellationToken);
+    }
+
+    public async Task<string> GenerateSummaryAsync(
+        GenerateLeadSummaryCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        if (command.FechaDesde.HasValue && command.FechaHasta.HasValue && command.FechaDesde > command.FechaHasta)
+        {
+            throw new ValidationException("El rango de fechas no es valido: fecha_desde no puede ser mayor que fecha_hasta.");
+        }
+
+        var fuente = ParseSourceOrNull(command.Fuente);
+        var leads = await _leadRepository.GetForSummaryAsync(
+            fuente,
+            command.FechaDesde,
+            command.FechaHasta,
+            cancellationToken);
+
+        if (leads.Count == 0)
+        {
+            return "No se encontraron leads para generar el resumen con los filtros enviados.";
+        }
+
+        return await _leadAiSummaryGenerator.GenerateAsync(
+            leads,
+            command.Fuente,
+            command.FechaDesde,
+            command.FechaHasta,
+            cancellationToken);
     }
 
     public Task<PagedResult<LeadResponse>> GetPagedAsync(GetLeadsQuery query, CancellationToken cancellationToken = default)

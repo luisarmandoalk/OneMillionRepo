@@ -42,8 +42,15 @@ public sealed class ApplicationDbContext : DbContext
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.CreatedAtUtc = utcNow;
-                entry.Entity.UpdatedAtUtc = utcNow;
+                if (entry.Entity.CreatedAtUtc == default)
+                {
+                    entry.Entity.CreatedAtUtc = utcNow;
+                }
+
+                if (entry.Entity.UpdatedAtUtc == default)
+                {
+                    entry.Entity.UpdatedAtUtc = utcNow;
+                }
             }
 
             if (entry.State == EntityState.Modified)

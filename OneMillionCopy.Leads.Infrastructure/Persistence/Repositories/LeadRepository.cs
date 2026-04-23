@@ -103,6 +103,50 @@ public sealed class LeadRepository : ILeadRepository
             leadsUltimos7Dias);
     }
 
+    public async Task<IReadOnlyCollection<LeadAiSummaryItem>> GetForSummaryAsync(
+        LeadSource? fuente,
+        DateTime? fechaDesde,
+        DateTime? fechaHasta,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _dbContext.Leads
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (fuente.HasValue)
+        {
+            query = query.Where(x => x.Fuente == fuente.Value);
+        }
+
+        if (fechaDesde.HasValue)
+        {
+            var startUtc = fechaDesde.Value.ToUniversalTime();
+            query = query.Where(x => x.CreatedAtUtc >= startUtc);
+        }
+
+        if (fechaHasta.HasValue)
+        {
+            var endUtc = fechaHasta.Value.ToUniversalTime();
+            query = query.Where(x => x.CreatedAtUtc <= endUtc);
+        }
+
+        return await query
+            .OrderByDescending(x => x.CreatedAtUtc)
+            .Select(x => new LeadAiSummaryItem(
+                x.Id,
+                x.Nombre,
+                x.Email,
+                x.Telefono,
+                x.Fuente == LeadSource.Instagram ? "instagram" :
+                x.Fuente == LeadSource.Facebook ? "facebook" :
+                x.Fuente == LeadSource.LandingPage ? "landing_page" :
+                x.Fuente == LeadSource.Referido ? "referido" : "otro",
+                x.ProductoInteres,
+                x.Presupuesto,
+                x.CreatedAtUtc))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<PagedResult<LeadResponse>> GetPagedAsync(
         int page,
         int limit,

@@ -21,6 +21,12 @@ public interface ILeadRepository
 
     Task<LeadStatsResponse> GetStatsAsync(CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyCollection<LeadAiSummaryItem>> GetForSummaryAsync(
+        LeadSource? fuente,
+        DateTime? fechaDesde,
+        DateTime? fechaHasta,
+        CancellationToken cancellationToken = default);
+
     Task<PagedResult<LeadResponse>> GetPagedAsync(
         int page,
         int limit,

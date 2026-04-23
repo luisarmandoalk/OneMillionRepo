@@ -3,6 +3,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <ProjectReference Include="..\OneMillionCopy.Leads.Domain\OneMillionCopy.Leads.Domain.csproj" />
     <ProjectReference Include="..\OneMillionCopy.Leads.Application\OneMillionCopy.Leads.Application.csproj" />
   </ItemGroup>

@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using OneMillionCopy.Leads.Api.Contracts.Leads;
 using OneMillionCopy.Leads.Application.Common.Exceptions;
 using OneMillionCopy.Leads.Application.Leads.Commands.CreateLead;
+using OneMillionCopy.Leads.Application.Leads.Commands.GenerateLeadSummary;
 using OneMillionCopy.Leads.Application.Leads.Commands.UpdateLead;
 using OneMillionCopy.Leads.Application.Leads.Queries.GetLeads;
 using OneMillionCopy.Leads.Application.Leads.Services;
@@ -37,6 +39,23 @@ public sealed class LeadsController : ControllerBase
         var response = await _leadService.GetStatsAsync(cancellationToken);
 
         return Ok(response);
+    }
+
+    [HttpPost("ai/summary")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GenerateSummary(
+        [FromBody] GenerateLeadSummaryRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new GenerateLeadSummaryCommand(
+            request.Fuente,
+            request.FechaDesde,
+            request.FechaHasta);
+
+        var response = await _leadService.GenerateSummaryAsync(command, cancellationToken);
+
+        return Content(response, "text/plain");
     }
 
     [HttpGet]

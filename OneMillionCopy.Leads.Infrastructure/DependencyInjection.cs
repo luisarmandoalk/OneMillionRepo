@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OneMillionCopy.Leads.Application.Abstractions.Persistence;
+using OneMillionCopy.Leads.Application.Leads.Services;
+using OneMillionCopy.Leads.Infrastructure.AI;
 using OneMillionCopy.Leads.Infrastructure.Persistence;
 using OneMillionCopy.Leads.Infrastructure.Persistence.Repositories;
 
@@ -19,6 +22,23 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
 
+        services.Configure<OpenAiOptions>(configuration.GetSection(OpenAiOptions.SectionName));
+        services.AddHttpClient<OpenAiLeadSummaryGenerator>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<OpenAiOptions>>().Value;
+            client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(60);
+        });
+        services.AddScoped<MockLeadSummaryGenerator>();
+        services.AddScoped<ILeadAiSummaryGenerator>(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<OpenAiOptions>>().Value;
+            return string.IsNullOrWhiteSpace(options.ApiKey)
+                ? serviceProvider.GetRequiredService<MockLeadSummaryGenerator>()
+                : serviceProvider.GetRequiredService<OpenAiLeadSummaryGenerator>();
+        });
+
+        services.AddScoped<ApplicationDbInitializer>();
         services.AddScoped<ILeadRepository, LeadRepository>();
 
         return services;
