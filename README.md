@@ -12,7 +12,7 @@ Swagger / OpenAPI: facilita pruebas manuales y documentación.
 OpenAI + mock fallback: permite cumplir integración con IA sin depender obligatoriamente de una API key.
 
 Cómo ejecutar el seed
-No necesitas un comando aparte. El seed corre automáticamente al arrancar la API si la tabla no tiene registros.
+No se necesita un comando aparte. El seed corre automáticamente al arrancar la API si la tabla no tiene registros.
 El inicializador está en:
 ApplicationDbInitializer.cs
 
